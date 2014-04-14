@@ -20,6 +20,7 @@ import org.junit.Test;
 public class ConfigInitializerTest {
     @Test
     public void testConfigLoader() {
-        new ConfigInitializer();
+        //new ConfigInitializer();
+        System.out.println(new ConfigInitializer());
     }
 }

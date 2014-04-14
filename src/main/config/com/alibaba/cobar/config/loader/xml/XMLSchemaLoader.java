@@ -71,6 +71,7 @@ public class XMLSchemaLoader implements SchemaLoader {
         this.load(DEFAULT_DTD, schemaFile == null ? DEFAULT_XML : schemaFile);
     }
 
+    //默认构造函数，通过this指针调用带参数的构造函数
     public XMLSchemaLoader() {
         this(null, null);
     }

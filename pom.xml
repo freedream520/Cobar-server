@@ -23,7 +23,7 @@
   <packaging>jar</packaging>
   <name>${artifactId}</name>
   <description>The project of cobar-server</description>
-  <url>http://code.alibabatech.com/wiki/display/Cobar</url>
+  <url>https://github.com/GeekCome/Cobar-server</url>
 
   <properties>
     <app.encoding>UTF-8</app.encoding>
@@ -39,7 +39,7 @@
     <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
-      <version>4.8.2</version>
+      <version>4.11</version>
       <scope>test</scope>
     </dependency>
   </dependencies>

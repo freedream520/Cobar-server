@@ -52,8 +52,8 @@ public class ConfigInitializer {
     private volatile Map<String, DataSourceConfig> dataSources;
 
     public ConfigInitializer() {
-        SchemaLoader schemaLoader = new XMLSchemaLoader();
-        XMLConfigLoader configLoader = new XMLConfigLoader(schemaLoader);
+        SchemaLoader schemaLoader = new XMLSchemaLoader();//加载rule.xml和schema.xml配置文件
+        XMLConfigLoader configLoader = new XMLConfigLoader(schemaLoader);//加载server.xml文件
         try {
             RouteRuleInitializer.initRouteRule(schemaLoader);
             schemaLoader = null;

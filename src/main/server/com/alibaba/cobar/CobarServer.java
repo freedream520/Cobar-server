@@ -43,6 +43,8 @@ import com.alibaba.cobar.util.TimeUtil;
  * @author xianmao.hexm 2011-4-19 下午02:58:59
  */
 public class CobarServer {
+	
+	//static final表示全局常量
     public static final String NAME = "Cobar";
     private static final long LOG_WATCH_DELAY = 60000L;
     private static final long TIME_UPDATE_PERIOD = 20L;
@@ -83,6 +85,7 @@ public class CobarServer {
         return config;
     }
 
+    //初始化日志系统
     public void beforeStart(String dateFormat) {
         String home = System.getProperty("cobar.home");
         if (home == null) {

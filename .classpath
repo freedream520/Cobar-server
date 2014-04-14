@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry excluding="**/.svn/**" including="**/*.java" kind="src" path="src/test/java"/>
+	<classpathentry excluding="**/.svn/**|**/*.java" kind="src" path="src/test/resources"/>
+	<classpathentry excluding="**/.svn/**" including="**/*.java" kind="src" path="src/main/net"/>
+	<classpathentry excluding="**/.svn/**" including="**/*.java" kind="src" path="src/main/parser"/>
+	<classpathentry excluding="**/.svn/**" including="**/*.java" kind="src" path="src/main/config"/>
+	<classpathentry excluding="**/.svn/**" including="**/*.java" kind="src" path="src/main/route"/>
+	<classpathentry excluding="**/.svn/**" including="**/*.java" kind="src" path="src/main/server"/>
+	<classpathentry excluding="**/.svn/**|**/*.java" kind="src" path="src/main/resources"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
+	<classpathentry kind="var" path="M2_REPO/log4j/log4j/1.2.17/log4j-1.2.17.jar" sourcepath="M2_REPO/log4j/log4j/1.2.17/log4j-1.2.17-sources.jar"/>
+	<classpathentry kind="var" path="M2_REPO/junit/junit/4.8.2/junit-4.8.2.jar" sourcepath="M2_REPO/junit/junit/4.8.2/junit-4.8.2-sources.jar"/>
+	<classpathentry kind="output" path="classes"/>
+</classpath>

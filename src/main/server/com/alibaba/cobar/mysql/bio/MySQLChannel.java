@@ -168,6 +168,8 @@ public final class MySQLChannel implements Channel {
         socket.setPerformancePreferences(0, 2, 1);
         socket.setReceiveBufferSize(RECV_BUFFER_SIZE);
         socket.setSendBufferSize(SEND_BUFFER_SIZE);
+        
+        LOGGER.info(dsc.toString());
         socket.connect(new InetSocketAddress(dsc.getHost(), dsc.getPort()), SOCKET_CONNECT_TIMEOUT);
         in = new BufferedInputStream(socket.getInputStream(), INPUT_STREAM_BUFFER);
         out = new BufferedOutputStream(socket.getOutputStream(), OUTPUT_STREAM_BUFFER);

@@ -73,9 +73,13 @@ public class CobarServer {
         SystemConfig system = config.getSystem();
         MySQLLexer.setCStyleCommentVersion(system.getParserCommentVersion());
         this.timer = new Timer(NAME + "Timer", true);
+        
+        //创建命名线程池，实现接口ThreadPoolExecutor
         this.initExecutor = ExecutorUtil.create("InitExecutor", system.getInitExecutor());
         this.timerExecutor = ExecutorUtil.create("TimerExecutor", system.getTimerExecutor());
         this.managerExecutor = ExecutorUtil.create("ManagerExecutor", system.getManagerExecutor());
+        
+        //创建SQL统计排序记录器对象
         this.sqlRecorder = new SQLRecorder(system.getSqlRecordCount());
         this.isOnline = new AtomicBoolean(true);
         this.startupTime = TimeUtil.currentTimeMillis();
@@ -101,23 +105,30 @@ public class CobarServer {
         LOGGER.info("===============================================");
         LOGGER.info(NAME + " is ready to startup ...");
         SystemConfig system = config.getSystem();
+        
+        //TODO 定时刷新时间，为何？需要的时候可以直接获取
         timer.schedule(updateTime(), 0L, TIME_UPDATE_PERIOD);
 
         // startup processors
         LOGGER.info("Startup processors ...");
         int handler = system.getProcessorHandler();
         int executor = system.getProcessorExecutor();
+        
+        //按处理器核心个数新建NIO处理
         processors = new NIOProcessor[system.getProcessors()];
         for (int i = 0; i < processors.length; i++) {
             processors[i] = new NIOProcessor("Processor" + i, handler, executor);
             processors[i].startup();
         }
+        
+        //定时执行检查人物，回收资源
         timer.schedule(processorCheck(), 0L, system.getProcessorCheckPeriod());
 
         // startup connector
         LOGGER.info("Startup connector ...");
+        //NIOConnecotr继承了Thread类，start启动线程
         connector = new NIOConnector(NAME + "Connector");
-        connector.setProcessors(processors);
+        connector.setProcessors(processors);//设置NIOProcessor
         connector.start();
 
         // init dataNodes
@@ -126,25 +137,33 @@ public class CobarServer {
         for (MySQLDataNode node : dataNodes.values()) {
             node.init(1, 0);
         }
+        //数据节点定时连接空闲超时检查任务
         timer.schedule(dataNodeIdleCheck(), 0L, system.getDataNodeIdleCheckPeriod());
+        //数据节点心跳发送任务
         timer.schedule(dataNodeHeartbeat(), 0L, system.getDataNodeHeartbeatPeriod());
 
         // startup manager
-        ManagerConnectionFactory mf = new ManagerConnectionFactory();
-        mf.setCharset(system.getCharset());
-        mf.setIdleTimeout(system.getIdleTimeout());
-        manager = new NIOAcceptor(NAME + "Manager", system.getManagerPort(), mf);
-        manager.setProcessors(processors);
-        manager.start();
-        LOGGER.info(manager.getName() + " is started and listening on " + manager.getPort());
+        // 先不分析前端部分
+//        ManagerConnectionFactory mf = new ManagerConnectionFactory();
+//        mf.setCharset(system.getCharset());
+//        mf.setIdleTimeout(system.getIdleTimeout());
+//        manager = new NIOAcceptor(NAME + "Manager", system.getManagerPort(), mf);
+//        manager.setProcessors(processors);
+//        manager.start();
+//        LOGGER.info(manager.getName() + " is started and listening on " + manager.getPort());
 
         // startup server
         ServerConnectionFactory sf = new ServerConnectionFactory();
         sf.setCharset(system.getCharset());
         sf.setIdleTimeout(system.getIdleTimeout());
+        //NIOAcceptor用于接收客户端连接
+        //构造函数完成获取selector，建立ServerSocketChannel建立，绑定端口，
+        //设置channel为非阻塞，向selector注册该channel
         server = new NIOAcceptor(NAME + "Server", system.getServerPort(), sf);
         server.setProcessors(processors);
         server.start();
+        
+        //向Cobar集群发送心跳包
         timer.schedule(clusterHeartbeat(), 0L, system.getClusterHeartbeatPeriod());
 
         // server started

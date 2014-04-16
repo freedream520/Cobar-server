@@ -28,6 +28,7 @@ public final class CobarStartup {
 
     public static void main(String[] args) {
         try {
+        	System.setProperty("cobar.home", "/home/yan/workspace1/cobar-server/assembly/");
             // init
         	//INSTANCE是static final变量，在初次访问就已经初始化，并且构造函数已经对server完成了配置
             CobarServer server = CobarServer.getInstance();

@@ -33,6 +33,7 @@ public class ExecutorUtil {
         return new NameableExecutor(name, size, new LinkedBlockingQueue<Runnable>(), factory);
     }
 
+    //内部类
     private static class NameableThreadFactory implements ThreadFactory {
         private final ThreadGroup group;
         private final String namePrefix;
@@ -43,8 +44,8 @@ public class ExecutorUtil {
             SecurityManager s = System.getSecurityManager();
             this.group = (s != null) ? s.getThreadGroup() : Thread.currentThread().getThreadGroup();
             this.namePrefix = name;
-            this.threadId = new AtomicInteger(0);
-            this.isDaemon = isDaemon;
+            this.threadId = new AtomicInteger(0);//设置线程号
+            this.isDaemon = isDaemon;//是否是守护进程
         }
 
         public Thread newThread(Runnable r) {

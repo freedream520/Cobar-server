@@ -30,6 +30,8 @@ import com.alibaba.cobar.net.factory.FrontendConnectionFactory;
 
 /**
  * @author xianmao.hexm
+ * Annotation by MingYan
+ * 该类用于接受来自客户端的连接
  */
 public final class NIOAcceptor extends Thread {
     private static final Logger LOGGER = Logger.getLogger(NIOAcceptor.class);
@@ -48,6 +50,7 @@ public final class NIOAcceptor extends Thread {
         this.port = port;
         this.selector = Selector.open();
         this.serverChannel = ServerSocketChannel.open();
+        //ServerSocket使用TCP
         this.serverChannel.socket().bind(new InetSocketAddress(port));
         this.serverChannel.configureBlocking(false);
         this.serverChannel.register(selector, SelectionKey.OP_ACCEPT);
@@ -77,6 +80,7 @@ public final class NIOAcceptor extends Thread {
                 try {
                     for (SelectionKey key : keys) {
                         if (key.isValid() && key.isAcceptable()) {
+                        	//接受来自客户端的连接
                             accept();
                         } else {
                             key.cancel();
@@ -94,13 +98,23 @@ public final class NIOAcceptor extends Thread {
     private void accept() {
         SocketChannel channel = null;
         try {
+        	//从服务器端获取管道
             channel = serverChannel.accept();
+            //配置管道为非阻塞
             channel.configureBlocking(false);
+            
+            //前端连接工厂对管道进行配置，设置socket的收发缓冲区大小，TCP延迟等
+            //然后由成员变量factory的类型生产对于的类型的连接
+            //比如ServerConnectionFactory会返回ServerConnection实例，并对其属性进行设置
             FrontendConnection c = factory.make(channel);
+            //设置连接属性
             c.setAccepted(true);
             c.setId(ID_GENERATOR.getId());
+            //从processors中选择一个NIOProcessor，将其和该连接绑定
             NIOProcessor processor = nextProcessor();
             c.setProcessor(processor);
+            //向读反应堆注册该连接，加入待处理队列
+            //select选择到感兴趣的事件后，会进行调用connection的read函数
             processor.postRegister(c);
         } catch (Throwable e) {
             closeChannel(channel);

@@ -154,7 +154,9 @@ public abstract class AbstractConnection implements NIOConnection {
         }
     }
 
+    
     @Override
+    //真实的数据读取函数，该函数实现了接口，子类也继承该函数
     public void read() throws IOException {
         ByteBuffer buffer = this.readBuffer;
         int got = channel.read(buffer);

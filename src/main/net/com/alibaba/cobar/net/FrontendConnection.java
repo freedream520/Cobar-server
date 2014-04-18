@@ -68,6 +68,7 @@ public abstract class FrontendConnection extends AbstractConnection {
         this.host = socket.getInetAddress().getHostAddress();
         this.port = socket.getPort();
         this.localPort = socket.getLocalPort();
+        //前端认证处理器
         this.handler = new FrontendAuthenticator(this);
     }
 
@@ -121,7 +122,9 @@ public abstract class FrontendConnection extends AbstractConnection {
 
     public void setProcessor(NIOProcessor processor) {
         this.processor = processor;
+        //从processor中获取缓冲区
         this.readBuffer = processor.getBufferPool().allocate();
+        //将连接加入processor中的Map，方便进行连接管理
         processor.addFrontend(this);
     }
 

@@ -24,6 +24,9 @@ import com.alibaba.cobar.net.buffer.BufferQueue;
 
 /**
  * @author xianmao.hexm
+ * Comment by MingYan
+ * 前端连接工厂类，该类是抽象类，getConnection方法是抽象方法
+ * 具体有其子类实现，子类包括ServerConnectionFactory\ManagerConnectionFactory等
  */
 public abstract class FrontendConnectionFactory {
 

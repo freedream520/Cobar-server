@@ -65,7 +65,7 @@ public class CobarServer {
     private final long startupTime;
     private NIOProcessor[] processors;
     private NIOConnector connector;
-    private NIOAcceptor manager;
+    //private NIOAcceptor manager;
     private NIOAcceptor server;
 
     private CobarServer() {
@@ -121,7 +121,7 @@ public class CobarServer {
             processors[i].startup();
         }
         
-        //定时执行检查人物，回收资源
+        //定时执行检查任务，回收资源
         timer.schedule(processorCheck(), 0L, system.getProcessorCheckPeriod());
 
         // startup connector
@@ -153,10 +153,12 @@ public class CobarServer {
 //        LOGGER.info(manager.getName() + " is started and listening on " + manager.getPort());
 
         // startup server
+        //创建服务器连接工厂
         ServerConnectionFactory sf = new ServerConnectionFactory();
         sf.setCharset(system.getCharset());
         sf.setIdleTimeout(system.getIdleTimeout());
-        //NIOAcceptor用于接收客户端连接
+        
+        //下面创建的NIOAcceptor用于接收客户端连接
         //构造函数完成获取selector，建立ServerSocketChannel建立，绑定端口，
         //设置channel为非阻塞，向selector注册该channel
         server = new NIOAcceptor(NAME + "Server", system.getServerPort(), sf);

@@ -44,10 +44,12 @@ public class ServerQueryHandler implements FrontendQueryHandler {
 
     @Override
     public void query(String sql) {
+    	//这里就得到了完整的SQL语句，接收自客户端
         ServerConnection c = this.source;
         if (LOGGER.isDebugEnabled()) {
             LOGGER.debug(new StringBuilder().append(c).append(sql).toString());
         }
+        //该函数对SQL语句的语法和语义进行分析，并返回SQL语句的对于类型，执行相应的操作
         int rs = ServerParse.parse(sql);
         switch (rs & 0xff) {
         case ServerParse.EXPLAIN:
@@ -60,6 +62,7 @@ public class ServerQueryHandler implements FrontendQueryHandler {
             ShowHandler.handle(sql, c, rs >>> 8);
             break;
         case ServerParse.SELECT:
+        	//select操作执行
             SelectHandler.handle(sql, c, rs >>> 8);
             break;
         case ServerParse.START:

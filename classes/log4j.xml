@@ -37,22 +37,25 @@
   </appender>
 
   <logger name="com.alibaba.cobar.sample.SampleServer">
-    <level value="info" />
+    <level value="debug" />
   </logger>
   <logger name="com.alibaba.cobar.sample.SampleQueryHandler">
     <level value="debug" />
   </logger>
   <logger name="com.alibaba.cobar.CobarServer">
-    <level value="info" />
+    <level value="debug" />
   </logger>
   <logger name="com.alibaba.cobar.net.handler.FrontendAuthenticator">
-    <level value="info" />
+    <level value="debug" />
+  </logger>
+  <logger name="com.alibaba.cobar.net.handler.FrontendCommandHandler">
+    <level value="debug" />
   </logger>
   <logger name="com.alibaba.cobar.mysql.MySQLDataNode">
-    <level value="info" />
+    <level value="debug" />
   </logger>
-  <logger name="com.alibaba.cobar.mysql.bio.MySQLChannel">
-    <level value="info" />
+    <logger name="com.alibaba.cobar.net.FrontendConnection">
+    <level value="debug" />
   </logger>
   <logger name="alarm">
     <level value="error" />

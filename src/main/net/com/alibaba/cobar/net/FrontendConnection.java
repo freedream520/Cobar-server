@@ -122,7 +122,7 @@ public abstract class FrontendConnection extends AbstractConnection {
 
     public void setProcessor(NIOProcessor processor) {
         this.processor = processor;
-        //从processor中获取缓冲区
+        //从processor中的缓冲池中获取缓冲区
         this.readBuffer = processor.getBufferPool().allocate();
         //将连接加入processor中的Map，方便进行连接管理
         processor.addFrontend(this);
@@ -265,6 +265,7 @@ public abstract class FrontendConnection extends AbstractConnection {
                 return;
             }
 
+            LOGGER.debug("解析的SQL语句:"+sql);
             // 执行查询
             queryHandler.query(sql);
         } else {
@@ -372,6 +373,11 @@ public abstract class FrontendConnection extends AbstractConnection {
             @Override
             public void run() {
                 try {
+                	//前端数据会调用com.alibaba.cobar.net.handler.FrontendCommandHandler
+                	//类的实现处理数据
+                	
+                	LOGGER.info(handler.getClass().getName()+"接收的请求长度:"+data.length);
+                    showByteArray(data);
                     handler.handle(data);
                 } catch (Throwable t) {
                     error(ErrorCode.ERR_HANDLE_DATA, t);
@@ -379,7 +385,20 @@ public abstract class FrontendConnection extends AbstractConnection {
             }
         });
     }
-
+    
+    /**
+     * 输出byte数组的值,测试使用
+     * @param data
+     */
+    private void showByteArray(final byte[] data){
+    	for(int i=0;i<data.length;++i){
+    		System.out.print(data[i]+" ");
+    		if((i+1) % 32 == 0)
+    			System.out.print("\n");
+    	}
+    	System.out.print("\n");
+    }
+    
     protected int getServerCapabilities() {
         int flag = 0;
         flag |= Capabilities.CLIENT_LONG_PASSWORD;

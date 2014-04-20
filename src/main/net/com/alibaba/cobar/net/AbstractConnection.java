@@ -156,18 +156,25 @@ public abstract class AbstractConnection implements NIOConnection {
 
     
     @Override
-    //真实的数据读取函数，该函数实现了接口，子类也继承该函数
+    //真实的数据读取函数，该函数实现了接口，具体的子类
+    //FrontendConnection & BackendConnection也继承该函数
     public void read() throws IOException {
+    	//获得缓冲区并从管道中读取数据，该缓冲区会在子类处理的之前从对应的
+    	//processor中获取缓冲区，每个processor执行的线程只能是一个，不会
+    	//发生资源的争用，可以对进行复用管理
+    	//该缓冲区从processor的缓冲池中获取
         ByteBuffer buffer = this.readBuffer;
         int got = channel.read(buffer);
         lastReadTime = TimeUtil.currentTimeMillis();
         if (got < 0) {
             throw new EOFException();
         }
+        //统计接收的数据大小
         netInBytes += got;
         processor.addNetInBytes(got);
 
         // 处理数据
+        //TODO readBufferOffset是在哪里设置的？
         int offset = readBufferOffset, length = 0, position = buffer.position();
         for (;;) {
             length = getPacketLength(buffer, offset);
@@ -179,11 +186,14 @@ public abstract class AbstractConnection implements NIOConnection {
             }
             if (position >= offset + length) {
                 // 提取一个数据包的数据进行处理
+            	System.out.println("offset:"+offset);
                 buffer.position(offset);
                 byte[] data = new byte[length];
                 buffer.get(data, 0, length);
+                //数据处理函数由具体的子类实现
+                //比如前端连接子类FrontendConnection类
                 handle(data);
-
+                
                 // 设置偏移量
                 offset += length;
                 if (position == offset) {// 数据正好全部处理完毕

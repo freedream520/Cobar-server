@@ -15,6 +15,8 @@
  */
 package com.alibaba.cobar.net.handler;
 
+import org.apache.log4j.Logger;
+
 import com.alibaba.cobar.config.ErrorCode;
 import com.alibaba.cobar.net.FrontendConnection;
 import com.alibaba.cobar.net.NIOHandler;
@@ -27,7 +29,7 @@ import com.alibaba.cobar.statistic.CommandCount;
  * @author xianmao.hexm
  */
 public class FrontendCommandHandler implements NIOHandler {
-
+	private static final Logger LOGGER = Logger.getLogger(FrontendCommandHandler.class);
     protected final FrontendConnection source;
     protected final CommandCount commands;
 
@@ -36,8 +38,10 @@ public class FrontendCommandHandler implements NIOHandler {
         this.commands = source.getProcessor().getCommands();
     }
 
+    //经过分析，调用前端连接类进行执行命令
     @Override
     public void handle(byte[] data) {
+    	LOGGER.info("data[4]:"+data[4]);
         switch (data[4]) {
         case MySQLPacket.COM_INIT_DB:
             commands.doInitDB();

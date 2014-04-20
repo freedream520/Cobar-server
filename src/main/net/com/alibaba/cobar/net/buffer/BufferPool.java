@@ -37,6 +37,7 @@ public final class BufferPool {
         capacity = (bufferSize % chunkSize == 0) ? capacity : capacity + 1;
         this.items = new ByteBuffer[capacity];
         this.lock = new ReentrantLock();
+        //初始化缓冲池
         for (int i = 0; i < capacity; i++) {
             insert(create(chunkSize));
         }
@@ -54,15 +55,22 @@ public final class BufferPool {
         return newCount;
     }
 
+    //从缓冲池中取出一块Buffer
     public ByteBuffer allocate() {
         ByteBuffer node = null;
+        //可重入锁
         final ReentrantLock lock = this.lock;
         lock.lock();
         try {
+        	//如果缓冲池剩余容量为0,则会重新分配一个Buffer
+        	//在回收的时候可以将该Buffer添加到缓冲区，
+        	//否则就在缓冲池中取出一块
             node = (count == 0) ? null : extract();
         } finally {
+        	//该语句必须放在finally中
             lock.unlock();
         }
+        
         if (node == null) {
             ++newCount;
             return create(chunkSize);

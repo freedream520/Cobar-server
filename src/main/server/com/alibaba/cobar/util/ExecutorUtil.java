@@ -28,12 +28,13 @@ public class ExecutorUtil {
         return create(name, size, true);
     }
 
+    //用于创建新的命名执行器
     public static final NameableExecutor create(String name, int size, boolean isDaemon) {
         NameableThreadFactory factory = new NameableThreadFactory(name, isDaemon);
         return new NameableExecutor(name, size, new LinkedBlockingQueue<Runnable>(), factory);
     }
 
-    //内部类
+    //内部工厂类，对外不可见
     private static class NameableThreadFactory implements ThreadFactory {
         private final ThreadGroup group;
         private final String namePrefix;

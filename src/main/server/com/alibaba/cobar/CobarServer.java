@@ -57,15 +57,20 @@ public class CobarServer {
 
     private final CobarConfig config;
     private final Timer timer;
+    
+    //NameableExecutor是继承自ThreadPoolExecuter的命名线程池
+    //managerExecutor处理Web管理端的请求
+    //
     private final NameableExecutor managerExecutor;
     private final NameableExecutor timerExecutor;
     private final NameableExecutor initExecutor;
+    
     private final SQLRecorder sqlRecorder;
     private final AtomicBoolean isOnline;
     private final long startupTime;
     private NIOProcessor[] processors;
     private NIOConnector connector;
-    //private NIOAcceptor manager;
+    private NIOAcceptor manager;
     private NIOAcceptor server;
 
     private CobarServer() {
@@ -74,7 +79,7 @@ public class CobarServer {
         MySQLLexer.setCStyleCommentVersion(system.getParserCommentVersion());
         this.timer = new Timer(NAME + "Timer", true);
         
-        //创建命名线程池，实现接口ThreadPoolExecutor
+        //创建命名线程池，可以daemon运行，实现接口ThreadPoolExecutor
         this.initExecutor = ExecutorUtil.create("InitExecutor", system.getInitExecutor());
         this.timerExecutor = ExecutorUtil.create("TimerExecutor", system.getTimerExecutor());
         this.managerExecutor = ExecutorUtil.create("ManagerExecutor", system.getManagerExecutor());
@@ -111,13 +116,17 @@ public class CobarServer {
 
         // startup processors
         LOGGER.info("Startup processors ...");
+        //得到处理器核心数
         int handler = system.getProcessorHandler();
         int executor = system.getProcessorExecutor();
         
-        //按处理器核心个数新建NIO处理
+        //按处理器核心个数新建NIO处理，这样在一定程度上可以做到业务的隔离，一个processor处理的
+        //任务不会影响其他的processor任务
+        //每个processor的handler和executer是继承自ThreadPoolExecutor的
         processors = new NIOProcessor[system.getProcessors()];
         for (int i = 0; i < processors.length; i++) {
             processors[i] = new NIOProcessor("Processor" + i, handler, executor);
+            //分别启动该processor的读和写reactor线程
             processors[i].startup();
         }
         

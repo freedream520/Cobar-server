@@ -144,6 +144,7 @@ public class ServerConnection extends FrontendConnection {
         RouteResultset rrs = null;
         try {
             rrs = ServerRouter.route(schema, sql, this.charset, this);
+            LOGGER.debug("路由计算结果:"+rrs.toString());
         } catch (SQLNonTransientException e) {
             StringBuilder s = new StringBuilder();
             LOGGER.warn(s.append(this).append(sql).toString(), e);

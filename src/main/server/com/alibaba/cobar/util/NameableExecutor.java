@@ -22,11 +22,15 @@ import java.util.concurrent.TimeUnit;
 
 /**
  * @author xianmao.hexm
+ * Annotation by MingYan
+ * 继承了Java中的ThreadPoolExecutor，在子类中添加了一个name属性
  */
 public class NameableExecutor extends ThreadPoolExecutor {
 
     protected String name;
 
+    //实际上是创建了一个命名的线程池
+    //queue是可以执行的任务队列
     public NameableExecutor(String name, int size, BlockingQueue<Runnable> queue, ThreadFactory factory) {
         super(size, size, Long.MAX_VALUE, TimeUnit.NANOSECONDS, queue, factory);
         this.name = name;

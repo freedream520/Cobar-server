@@ -221,6 +221,7 @@ public final class MySQLChannel implements Channel {
         // 递交执行数据包并等待执行返回
         packet.write(out);
         out.flush();
+        //返回的数据包
         BinaryPacket bin = receive();
 
         // SQL执行时间统计

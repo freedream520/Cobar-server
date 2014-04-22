@@ -35,12 +35,18 @@ public final class NIOProcessor {
     private static final int AVAILABLE_PROCESSORS = Runtime.getRuntime().availableProcessors();
 
     private final String name;
+    //reactor中包含一个读反应器和写反应器，分别用于处理读写数据
     private final NIOReactor reactor;
+    //每个processor拥有自己的缓冲池
     private final BufferPool bufferPool;
+    
+    //新建两个命名的线程池，分别用于处理处理前端和后端的连接
     private final NameableExecutor handler;
     private final NameableExecutor executor;
+    //这两个HashMap用于保存前端和后端的连接
     private final ConcurrentMap<Long, FrontendConnection> frontends;
     private final ConcurrentMap<Long, BackendConnection> backends;
+    //下面三个变量用于进行数据统计
     private final CommandCount commands;
     private long netInBytes;
     private long netOutBytes;
@@ -56,11 +62,18 @@ public final class NIOProcessor {
     public NIOProcessor(String name, int buffer, int chunk, int handler, int executor) throws IOException {
         this.name = name;
         this.reactor = new NIOReactor(name);
+        
+        //每个processor有独立的数据缓冲区
         this.bufferPool = new BufferPool(buffer, chunk);
+        
+        //根据设置的handler和excutor数量，生成指定大小的线程池（大小默认是处理器的核心数目）
         this.handler = (handler > 0) ? ExecutorUtil.create(name + "-H", handler) : null;
         this.executor = (executor > 0) ? ExecutorUtil.create(name + "-E", executor) : null;
+        
+        //多线程安全的HashMap
         this.frontends = new ConcurrentHashMap<Long, FrontendConnection>();
         this.backends = new ConcurrentHashMap<Long, BackendConnection>();
+        
         this.commands = new CommandCount();
     }
 
@@ -142,6 +155,7 @@ public final class NIOProcessor {
 
     /**
      * 定时执行该方法，回收部分资源。
+     * 在Cobar Server初始化的时就绑定给Timer，定期执行
      */
     public void check() {
         frontendCheck();
@@ -149,6 +163,7 @@ public final class NIOProcessor {
     }
 
     // 前端连接检查
+    //遍历Map检查所有连接的状态
     private void frontendCheck() {
         Iterator<Entry<Long, FrontendConnection>> it = frontends.entrySet().iterator();
         while (it.hasNext()) {
@@ -165,6 +180,7 @@ public final class NIOProcessor {
                 it.remove();
                 c.cleanup();
             } else {
+            	//检查连接是否超时，如果超时就关闭该连接
                 c.idleCheck();
             }
         }

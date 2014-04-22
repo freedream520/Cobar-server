@@ -54,7 +54,11 @@
   <logger name="com.alibaba.cobar.mysql.MySQLDataNode">
     <level value="debug" />
   </logger>
-    <logger name="com.alibaba.cobar.net.FrontendConnection">
+  <logger name="com.alibaba.cobar.net.FrontendConnection">
+    <level value="debug" />
+  </logger>
+  
+  <logger name="com.alibaba.cobar.server.ServerConnection">
     <level value="debug" />
   </logger>
   <logger name="alarm">

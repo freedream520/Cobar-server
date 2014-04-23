@@ -45,11 +45,13 @@ public final class NIOReactor {
     }
 
     final void startup() {
+    	//启动两个线程
         new Thread(reactorR, name + "-R").start();
         new Thread(reactorW, name + "-W").start();
     }
 
     final void postRegister(NIOConnection c) {
+    	//先将连接加入队列,然后唤醒
         reactorR.registerQueue.offer(c);
         reactorR.selector.wakeup();
     }
@@ -86,8 +88,11 @@ public final class NIOReactor {
             for (;;) {
                 ++reactCount;
                 try {
-                    selector.select(1000L);
+                	//TODO 为何设置select超时时间
+                    int res = selector.select();
+                    System.out.println(reactCount + ">>NIOReactor接受连接数:" + res);
                     register(selector);
+                    
                     Set<SelectionKey> keys = selector.selectedKeys();
                     try {
                         for (SelectionKey key : keys) {
@@ -116,8 +121,14 @@ public final class NIOReactor {
 
         private void register(Selector selector) {
             NIOConnection c = null;
+            //将待注册队列中的连接向selector注册
             while ((c = registerQueue.poll()) != null) {
                 try {
+                	//该函数定义在接口NIOConnection
+                	//具体实现在其子类FrontendConnection和BackendConnection中
+                	//eg.在FrontendConnection实现的函数中会:
+                	//1 将channel向selector注册OP_READ读事件
+                	//2 向连接的客户端发生握手包
                     c.register(selector);
                 } catch (Throwable e) {
                     c.error(ErrorCode.ERR_REGISTER, e);

@@ -60,6 +60,7 @@ public class CobarServer {
     
     //NameableExecutor是继承自ThreadPoolExecuter的命名线程池
     //managerExecutor处理Web管理端的请求
+    //timerExecutor是处理定时执行任务
     //
     private final NameableExecutor managerExecutor;
     private final NameableExecutor timerExecutor;
@@ -126,16 +127,18 @@ public class CobarServer {
         processors = new NIOProcessor[system.getProcessors()];
         for (int i = 0; i < processors.length; i++) {
             processors[i] = new NIOProcessor("Processor" + i, handler, executor);
-            //分别启动该processor的读和写reactor线程
+            //每个processor都启动该processor的读和写reactor线程
             processors[i].startup();
         }
         
-        //定时执行检查任务，回收资源
+        //定时执行检查任务，回收资源，分别遍历前端和后端连接的ConcurrentHashmap,移除失效的连接
+        //清理已经关闭连接，并进行资源回收，否则对连接进行超时检查
         timer.schedule(processorCheck(), 0L, system.getProcessorCheckPeriod());
 
         // startup connector
         LOGGER.info("Startup connector ...");
         //NIOConnecotr继承了Thread类，start启动线程
+        //TODO 处理后端连接,向后端MySQL节点建立连接
         connector = new NIOConnector(NAME + "Connector");
         connector.setProcessors(processors);//设置NIOProcessor
         connector.start();
@@ -152,7 +155,7 @@ public class CobarServer {
         timer.schedule(dataNodeHeartbeat(), 0L, system.getDataNodeHeartbeatPeriod());
 
         // startup manager
-        // 先不分析前端部分
+        // TODO 先不分析前端部分
 //        ManagerConnectionFactory mf = new ManagerConnectionFactory();
 //        mf.setCharset(system.getCharset());
 //        mf.setIdleTimeout(system.getIdleTimeout());
@@ -168,7 +171,7 @@ public class CobarServer {
         sf.setIdleTimeout(system.getIdleTimeout());
         
         //下面创建的NIOAcceptor用于接收客户端连接
-        //构造函数完成获取selector，建立ServerSocketChannel建立，绑定端口，
+        //构造函数完成获取selector，建立ServerSocketChannel建立，绑定端口
         //设置channel为非阻塞，向selector注册该channel
         server = new NIOAcceptor(NAME + "Server", system.getServerPort(), sf);
         server.setProcessors(processors);
@@ -240,6 +243,7 @@ public class CobarServer {
                 timerExecutor.execute(new Runnable() {
                     @Override
                     public void run() {
+                    	System.out.println("处理器定时检查任务");
                         for (NIOProcessor p : processors) {
                             p.check();
                         }
@@ -257,6 +261,7 @@ public class CobarServer {
                 timerExecutor.execute(new Runnable() {
                     @Override
                     public void run() {
+                    	System.out.println("数据节点定时连接空闲超时检查");
                         Map<String, MySQLDataNode> nodes = config.getDataNodes();
                         for (MySQLDataNode node : nodes.values()) {
                             node.idleCheck();
@@ -281,6 +286,7 @@ public class CobarServer {
                 timerExecutor.execute(new Runnable() {
                     @Override
                     public void run() {
+                    	System.out.println("数据节点定时心跳任务");
                         Map<String, MySQLDataNode> nodes = config.getDataNodes();
                         for (MySQLDataNode node : nodes.values()) {
                             node.doHeartbeat();
@@ -299,6 +305,7 @@ public class CobarServer {
                 timerExecutor.execute(new Runnable() {
                     @Override
                     public void run() {
+                    	System.out.println("集群节点定时心跳任务");
                         Map<String, CobarNode> nodes = config.getCluster().getNodes();
                         for (CobarNode node : nodes.values()) {
                             node.doHeartbeat();

@@ -69,12 +69,15 @@ public final class MySQLDataNode {
     }
 
     public void init(int size, int index) {
+    	//检查index的合法性,不合法就设置为0
         if (!checkIndex(index)) {
             index = 0;
         }
         int active = -1;
         for (int i = 0; i < sources.length; i++) {
+        	//loop就是对i+index进行取余操作
             int j = loop(i + index);
+            
             if (initSource(sources[j], size)) {
                 active = j;
                 break;

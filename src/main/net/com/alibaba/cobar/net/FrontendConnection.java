@@ -339,6 +339,7 @@ public abstract class FrontendConnection extends AbstractConnection {
 
     @Override
     public void register(Selector selector) throws IOException {
+    	//向selector注册该channel,并绑定感兴趣事件
         super.register(selector);
         if (!isClosed.get()) {
             // 生成认证数据

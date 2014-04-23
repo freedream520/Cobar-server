@@ -45,6 +45,9 @@ public final class NIOAcceptor extends Thread {
     private int nextProcessor;
     private long acceptCount;
 
+    //构造函数主要完成:
+    //获取selector,获取serverChannel,绑定监听的端口,设置Channel为非阻塞,向selector注册该channel
+    //并绑定感兴趣的事件为OP_ACCEPT
     public NIOAcceptor(String name, int port, FrontendConnectionFactory factory) throws IOException {
         super.setName(name);
         this.port = port;
@@ -72,6 +75,7 @@ public final class NIOAcceptor extends Thread {
     @Override
     public void run() {
         final Selector selector = this.selector;
+        //线程一直循环
         for (;;) {
             ++acceptCount;
             try {
@@ -98,7 +102,7 @@ public final class NIOAcceptor extends Thread {
     private void accept() {
         SocketChannel channel = null;
         try {
-        	//从服务器端获取管道
+        	//从服务器端获取管道,为一个新的连接返回channel
             channel = serverChannel.accept();
             //配置管道为非阻塞
             channel.configureBlocking(false);

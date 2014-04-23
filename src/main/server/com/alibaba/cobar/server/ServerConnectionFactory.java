@@ -33,6 +33,7 @@ public class ServerConnectionFactory extends FrontendConnectionFactory {
     @Override
     protected FrontendConnection getConnection(SocketChannel channel) {
         SystemConfig sys = CobarServer.getInstance().getConfig().getSystem();
+        //将channel创建一个连接对象
         ServerConnection c = new ServerConnection(channel);
         c.setPrivileges(new CobarPrivileges());
         c.setQueryHandler(new ServerQueryHandler(c));

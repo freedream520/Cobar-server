@@ -52,7 +52,9 @@ public class FrontendAuthenticator implements NIOHandler {
             return;
         }
 
+        //新建认证包对象
         AuthPacket auth = new AuthPacket();
+        //读取认证包到对象
         auth.read(data);
 
         // check user
@@ -77,6 +79,7 @@ public class FrontendAuthenticator implements NIOHandler {
             failure(ErrorCode.ER_DBACCESS_DENIED_ERROR, s);
             break;
         default:
+        	//认证成功,向客户端发送认证结果消息
             success(auth);
         }
     }
@@ -139,10 +142,12 @@ public class FrontendAuthenticator implements NIOHandler {
     }
 
     protected void success(AuthPacket auth) {
+    	//认证通过,设置连接属性:已认证\用户\数据库\处理器
         source.setAuthenticated(true);
         source.setUser(auth.user);
         source.setSchema(auth.database);
         source.setCharsetIndex(auth.charsetIndex);
+        //设置该连接的连接处理器为前端命令处理器
         source.setHandler(new FrontendCommandHandler(source));
         if (LOGGER.isInfoEnabled()) {
             StringBuilder s = new StringBuilder();

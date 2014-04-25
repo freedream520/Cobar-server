@@ -243,7 +243,7 @@ public class CobarServer {
                 timerExecutor.execute(new Runnable() {
                     @Override
                     public void run() {
-                    	System.out.println("处理器定时检查任务");
+                    	LOGGER.debug("处理器定时检查任务");
                         for (NIOProcessor p : processors) {
                             p.check();
                         }
@@ -261,7 +261,7 @@ public class CobarServer {
                 timerExecutor.execute(new Runnable() {
                     @Override
                     public void run() {
-                    	System.out.println("数据节点定时连接空闲超时检查");
+                    	LOGGER.debug("数据节点定时连接空闲超时检查");
                         Map<String, MySQLDataNode> nodes = config.getDataNodes();
                         for (MySQLDataNode node : nodes.values()) {
                             node.idleCheck();
@@ -286,7 +286,7 @@ public class CobarServer {
                 timerExecutor.execute(new Runnable() {
                     @Override
                     public void run() {
-                    	System.out.println("数据节点定时心跳任务");
+                    	LOGGER.debug("数据节点定时心跳任务");
                         Map<String, MySQLDataNode> nodes = config.getDataNodes();
                         for (MySQLDataNode node : nodes.values()) {
                             node.doHeartbeat();
@@ -305,7 +305,7 @@ public class CobarServer {
                 timerExecutor.execute(new Runnable() {
                     @Override
                     public void run() {
-                    	System.out.println("集群节点定时心跳任务");
+                    	LOGGER.debug("集群节点定时心跳任务");
                         Map<String, CobarNode> nodes = config.getCluster().getNodes();
                         for (CobarNode node : nodes.values()) {
                             node.doHeartbeat();

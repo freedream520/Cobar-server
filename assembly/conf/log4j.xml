@@ -43,7 +43,7 @@
     <level value="debug" />
   </logger>
   <logger name="com.alibaba.cobar.CobarServer">
-    <level value="debug" />
+    <level value="info" />
   </logger>
   <logger name="com.alibaba.cobar.net.handler.FrontendAuthenticator">
     <level value="debug" />
@@ -59,6 +59,9 @@
   </logger>
   
   <logger name="com.alibaba.cobar.server.ServerConnection">
+    <level value="debug" />
+  </logger>
+  <logger name="com.alibaba.cobar.net.NIOReactor">
     <level value="debug" />
   </logger>
   <logger name="alarm">

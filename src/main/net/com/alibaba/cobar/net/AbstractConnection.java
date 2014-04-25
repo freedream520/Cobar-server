@@ -186,8 +186,9 @@ public abstract class AbstractConnection implements NIOConnection {
             }
             if (position >= offset + length) {
                 // 提取一个数据包的数据进行处理
-            	System.out.println("offset:"+offset);
+            	//System.out.println("offset:"+offset);
                 buffer.position(offset);
+                //从缓冲区提取数据
                 byte[] data = new byte[length];
                 buffer.get(data, 0, length);
                 //数据处理函数由具体的子类实现
@@ -230,6 +231,7 @@ public abstract class AbstractConnection implements NIOConnection {
         }
         if (isRegistered) {
             try {
+            	//添加待发送缓冲区到队列
                 writeQueue.put(buffer);
             } catch (InterruptedException e) {
                 error(ErrorCode.ERR_PUT_WRITE_QUEUE, e);

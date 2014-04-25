@@ -45,6 +45,7 @@ import com.alibaba.cobar.net.BackendConnection;
  * @author xianmao.hexm 2010-7-15 下午04:35:34
  */
 public class AuthPacket extends MySQLPacket {
+	//协议中有23长度的保留空间,目前使用0填充
     private static final byte[] FILLER = new byte[23];
 
     public long clientFlags;
@@ -55,24 +56,32 @@ public class AuthPacket extends MySQLPacket {
     public byte[] password;
     public String database;
 
+    //以MySQL协议包进行读取解析
     public void read(byte[] data) {
+    	//MySQLMessage类是对MySQL数据包内容和操作的封装,包含数据包的内容和数据操作函数
         MySQLMessage mm = new MySQLMessage(data);
-        packetLength = mm.readUB3();
-        packetId = mm.read();
-        clientFlags = mm.readUB4();
-        maxPacketSize = mm.readUB4();
-        charsetIndex = (mm.read() & 0xff);
+        
+        packetLength = mm.readUB3();//数据包长度
+        packetId = mm.read();//数据包序号
+        clientFlags = mm.readUB4();//客户端协议能力掩码
+        maxPacketSize = mm.readUB4();//客户端发送或接收的最大包长度,0意味这客户端没有自己的限制
+        charsetIndex = (mm.read() & 0xff);//客户端使用的默认字符集代码
         // read extra
-        int current = mm.position();
+        //读取附加选项
+        int current = mm.position();//暂存当前的读取位置
         int len = (int) mm.readLength();
         if (len > 0 && len < FILLER.length) {
             byte[] ab = new byte[len];
             System.arraycopy(mm.bytes(), mm.position(), ab, 0, len);
             this.extra = ab;
         }
+        //跳到填充值之后
         mm.position(current + FILLER.length);
+        //读取用户名
         user = mm.readStringWithNull();
+        //读取密码
         password = mm.readBytesWithLength();
+        //如果支持数据库名称并且缓冲区还有数据,则读取数据库名
         if (((clientFlags & Capabilities.CLIENT_CONNECT_WITH_DB) != 0) && mm.hasRemaining()) {
             database = mm.readStringWithNull();
         }

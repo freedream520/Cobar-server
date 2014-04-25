@@ -90,9 +90,8 @@ public final class NIOReactor {
                 try {
                 	//TODO 为何设置select超时时间
                     int res = selector.select();
-                    System.out.println(reactCount + ">>NIOReactor接受连接数:" + res);
+                    LOGGER.debug(reactCount + ">>NIOReactor接受连接数:" + res);
                     register(selector);
-                    
                     Set<SelectionKey> keys = selector.selectedKeys();
                     try {
                         for (SelectionKey key : keys) {
@@ -100,8 +99,10 @@ public final class NIOReactor {
                             if (att != null && key.isValid()) {
                                 int readyOps = key.readyOps();
                                 if ((readyOps & SelectionKey.OP_READ) != 0) {
+                                	LOGGER.debug("select读事件");
                                     read((NIOConnection) att);
                                 } else if ((readyOps & SelectionKey.OP_WRITE) != 0) {
+                                	LOGGER.debug("select写事件");
                                     write((NIOConnection) att);
                                 } else {
                                     key.cancel();
@@ -128,7 +129,7 @@ public final class NIOReactor {
                 	//具体实现在其子类FrontendConnection和BackendConnection中
                 	//eg.在FrontendConnection实现的函数中会:
                 	//1 将channel向selector注册OP_READ读事件
-                	//2 向连接的客户端发生握手包
+                	//2 向连接的客户端发送握手包
                     c.register(selector);
                 } catch (Throwable e) {
                     c.error(ErrorCode.ERR_REGISTER, e);

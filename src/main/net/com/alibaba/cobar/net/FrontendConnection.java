@@ -128,6 +128,7 @@ public abstract class FrontendConnection extends AbstractConnection {
         processor.addFrontend(this);
     }
 
+    //设置handler对象,根据不同的属性数据包类型,进行处理,该属性在认证成功后success函数中设置
     public void setHandler(NIOHandler handler) {
         this.handler = handler;
     }
@@ -369,16 +370,17 @@ public abstract class FrontendConnection extends AbstractConnection {
 
     @Override
     public void handle(final byte[] data) {
-        // 异步处理前端数据
+        // 新建线程,异步处理前端数据
+    	// 从processor中的线程池中获取一个可以执行的线程,执行Runnable任务
         processor.getHandler().execute(new Runnable() {
             @Override
             public void run() {
                 try {
                 	//前端数据会调用com.alibaba.cobar.net.handler.FrontendCommandHandler
-                	//类的实现处理数据
-                	
+                	//类的实现来处理数据
                 	LOGGER.info(handler.getClass().getName()+"接收的请求长度:"+data.length);
                     showByteArray(data);
+                    //调用具体NIOHandler子类的handle函数
                     handler.handle(data);
                 } catch (Throwable t) {
                     error(ErrorCode.ERR_HANDLE_DATA, t);
@@ -393,9 +395,7 @@ public abstract class FrontendConnection extends AbstractConnection {
      */
     private void showByteArray(final byte[] data){
     	for(int i=0;i<data.length;++i){
-    		System.out.print(data[i]+" ");
-    		if((i+1) % 32 == 0)
-    			System.out.print("\n");
+    		System.out.print((data[i]&0xff)+" ");
     	}
     	System.out.print("\n");
     }

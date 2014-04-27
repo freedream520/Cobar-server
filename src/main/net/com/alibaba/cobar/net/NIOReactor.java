@@ -65,6 +65,8 @@ public final class NIOReactor {
     }
 
     final void postWrite(NIOConnection c) {
+    	//将要要发送的连接(内容在连接对象中的缓冲区队列中)加入队列
+    	//reactorW会按序查看队列,进行发送
         reactorW.writeQueue.offer(c);
     }
 
@@ -163,6 +165,7 @@ public final class NIOReactor {
 
         @Override
         public void run() {
+        	//客户端发送认证信息,前端将包含回复信息的链接加入队列,按顺序发送
             NIOConnection c = null;
             for (;;) {
                 try {
@@ -177,6 +180,8 @@ public final class NIOReactor {
 
         private void write(NIOConnection c) {
             try {
+            	//TODO 调用具体连接的writeByQueue函数进行数据的发送
+            	//具体发送过程待探究
                 c.writeByQueue();
             } catch (Throwable e) {
                 c.error(ErrorCode.ERR_WRITE_BY_QUEUE, e);

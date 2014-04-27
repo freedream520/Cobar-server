@@ -147,7 +147,7 @@ public class FrontendAuthenticator implements NIOHandler {
         source.setUser(auth.user);
         source.setSchema(auth.database);
         source.setCharsetIndex(auth.charsetIndex);
-        //设置该连接的连接处理器为前端命令处理器
+        //认证成功后,设置该连接的连接处理器为前端命令处理器
         source.setHandler(new FrontendCommandHandler(source));
         if (LOGGER.isInfoEnabled()) {
             StringBuilder s = new StringBuilder();

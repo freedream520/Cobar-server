@@ -48,6 +48,8 @@ public class CobarServer {
     public static final String NAME = "Cobar";
     private static final long LOG_WATCH_DELAY = 60000L;
     private static final long TIME_UPDATE_PERIOD = 20L;
+    
+    //static变量只初始化一次,单例模式
     private static final CobarServer INSTANCE = new CobarServer();
     private static final Logger LOGGER = Logger.getLogger(CobarServer.class);
 
@@ -173,6 +175,7 @@ public class CobarServer {
         //下面创建的NIOAcceptor用于接收客户端连接
         //构造函数完成获取selector，建立ServerSocketChannel建立，绑定端口
         //设置channel为非阻塞，向selector注册该channel
+        //name port serverconnectionfactory
         server = new NIOAcceptor(NAME + "Server", system.getServerPort(), sf);
         server.setProcessors(processors);
         server.start();

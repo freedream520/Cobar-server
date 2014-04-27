@@ -370,7 +370,7 @@ public abstract class FrontendConnection extends AbstractConnection {
 
     @Override
     public void handle(final byte[] data) {
-        // 新建线程,异步处理前端数据
+        // 从线程池获取一个线程,异步处理前端数据
     	// 从processor中的线程池中获取一个可以执行的线程,执行Runnable任务
         processor.getHandler().execute(new Runnable() {
             @Override

@@ -38,6 +38,7 @@ public abstract class FrontendConnectionFactory {
     protected long idleTimeout = 8 * 3600 * 1000L;
     protected String charset = "utf8";
 
+    //根据不同的连接工厂,返回不同的连接
     protected abstract FrontendConnection getConnection(SocketChannel channel);
 
     public FrontendConnection make(SocketChannel channel) throws IOException {
@@ -47,6 +48,7 @@ public abstract class FrontendConnectionFactory {
         socket.setTcpNoDelay(true);
         socket.setKeepAlive(true);
         FrontendConnection c = getConnection(channel);
+        //设置连接属性
         c.setPacketHeaderSize(packetHeaderSize);
         c.setMaxPacketSize(maxPacketSize);
         c.setWriteQueue(new BufferQueue(writeQueueCapcity));

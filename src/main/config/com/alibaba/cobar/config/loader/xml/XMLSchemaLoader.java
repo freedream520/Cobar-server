@@ -60,6 +60,7 @@ public class XMLSchemaLoader implements SchemaLoader {
     private final Map<String, SchemaConfig> schemas;
 
     public XMLSchemaLoader(String schemaFile, String ruleFile) {
+    	//获取rule.xml配置信息
         XMLRuleLoader ruleLoader = new XMLRuleLoader(ruleFile);
         this.rules = ruleLoader.listRuleConfig();
         this.tableRules = ruleLoader.getTableRules();
@@ -68,6 +69,7 @@ public class XMLSchemaLoader implements SchemaLoader {
         this.dataSources = new HashMap<String, DataSourceConfig>();
         this.dataNodes = new HashMap<String, DataNodeConfig>();
         this.schemas = new HashMap<String, SchemaConfig>();
+        //获取schema.xml配置文件
         this.load(DEFAULT_DTD, schemaFile == null ? DEFAULT_XML : schemaFile);
     }
 

@@ -225,6 +225,7 @@ public abstract class AbstractConnection implements NIOConnection {
 
     @Override
     public void write(ByteBuffer buffer) {
+    	//连接已关闭,则回收缓冲区
         if (isClosed.get()) {
             processor.getBufferPool().recycle(buffer);
             return;
@@ -237,6 +238,8 @@ public abstract class AbstractConnection implements NIOConnection {
                 error(ErrorCode.ERR_PUT_WRITE_QUEUE, e);
                 return;
             }
+            //然后交给processor对象,进一步交给processor中的REACTOR_W处理
+            //注意参数是该对象的引用,通过该对象调用
             processor.postWrite(this);
         } else {
             processor.getBufferPool().recycle(buffer);
@@ -429,6 +432,9 @@ public abstract class AbstractConnection implements NIOConnection {
         }
     }
 
+    //TODO
+    //返回值:true  buffer中的数据已经全部写入channel
+    //		false  buffer还有遗留的数据尚未写入channel
     private boolean write0() throws IOException {
         // 检查是否有遗留数据未写出
         ByteBuffer buffer = writeQueue.attachment();
@@ -449,13 +455,14 @@ public abstract class AbstractConnection implements NIOConnection {
         }
         // 写出发送队列中的数据块
         if ((buffer = writeQueue.poll()) != null) {
-            // 如果是一块未使用过的buffer，则执行关闭连接。
+            // 如果是一块未使用过的buffer，则执行关闭连接,回收buffer。
             if (buffer.position() == 0) {
                 processor.getBufferPool().recycle(buffer);
                 close();
                 return true;
             }
-            buffer.flip();
+            buffer.flip();//为buffer的写操作做准备
+            //向该连接的channel写数据
             int written = channel.write(buffer);
             if (written > 0) {
                 netOutBytes += written;
@@ -481,10 +488,12 @@ public abstract class AbstractConnection implements NIOConnection {
         lock.lock();
         try {
             SelectionKey key = this.processKey;
+            //给该selectionKey添加写兴趣
             key.interestOps(key.interestOps() | SelectionKey.OP_WRITE);
         } finally {
             lock.unlock();
         }
+        //唤醒阻塞的select函数
         processKey.selector().wakeup();
     }
 

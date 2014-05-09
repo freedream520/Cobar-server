@@ -151,6 +151,7 @@ public final class MultiNodeExecutor extends NodeExecutor {
 
         // 多节点处理
         ConcurrentMap<RouteResultsetNode, Channel> target = ss.getTarget();
+        LOGGER.debug("target size =" + target.size());
         for (RouteResultsetNode rrn : nodes) {
             Channel c = target.get(rrn);
             if (c != null) {
@@ -230,7 +231,7 @@ public final class MultiNodeExecutor extends NodeExecutor {
         try {
             // 执行并等待返回
             BinaryPacket bin = ((MySQLChannel) c).execute(rrn, sc, autocommit);
-
+            LOGGER.debug(rrn.getName()+" 缓冲区剩余大小:"+buffer.remaining());
             // 接收和处理数据
             final ReentrantLock lock = MultiNodeExecutor.this.lock;
             lock.lock();
@@ -253,7 +254,7 @@ public final class MultiNodeExecutor extends NodeExecutor {
                     break;
                 default: // HEADER|FIELDS|FIELD_EOF|ROWS|LAST_EOF
                     final MySQLChannel mc = (MySQLChannel) c;
-                    if (fieldEOF) {
+                    if (fieldEOF) {//列结束
                         for (;;) {
                             bin = mc.receive();
                             switch (bin.data[0]) {

@@ -41,6 +41,9 @@ public class FrontendCommandHandler implements NIOHandler {
     //经过分析，调用前端连接类进行执行命令
     @Override
     public void handle(byte[] data) {
+    	//由于每个报文都有消息头，消息头固定的是4个字节，前3个字节是消息长度，后面的一个字节是报文序号
+    	//所以data[4]是第五个字节。也就是消息体的第一个字节。
+    	//客户端向Cobar端发送的是命令报文，第一个字节是具体的命令
     	LOGGER.info("data[4]:"+data[4]);
         switch (data[4]) {
         case MySQLPacket.COM_INIT_DB:

@@ -68,6 +68,11 @@ public final class ServerRouter {
 
     public static RouteResultset route(SchemaConfig schema, String stmt, String charset, Object info)
             throws SQLNonTransientException {
+    	//路由结果对象，包含的属性如下
+        //final String statement; // 原始语句
+        //RouteResultsetNode[] nodes; // 路由结果节点
+        //int flag; // 结果集的处理标识，比如：合并，相加等。
+        //long limitSize;
         RouteResultset rrs = new RouteResultset(stmt);
 
         // 检查是否含有cobar hint
@@ -79,6 +84,7 @@ public final class ServerRouter {
 
         // 检查schema是否含有拆分库
         if (schema.isNoSharding()) {
+        	//没有分库
             if (schema.isKeepSqlSchema()) {
                 SQLStatement ast = SQLParserDelegate.parse(stmt, charset == null
                         ? MySQLParser.DEFAULT_CHARSET : charset);

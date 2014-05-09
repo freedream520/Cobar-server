@@ -57,6 +57,9 @@
   <logger name="com.alibaba.cobar.net.FrontendConnection">
     <level value="debug" />
   </logger>
+  <logger name="com.alibaba.cobar.mysql.bio.executor.MultiNodeExecutor">
+    <level value="debug" />
+  </logger>
   
   <logger name="com.alibaba.cobar.server.ServerConnection">
     <level value="debug" />
